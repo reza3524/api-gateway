@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: accounting
+          uri: lb://accounting
+          predicates:
+            - Method= GET
+            - Path= /account/{id}
+          filters:
+            - SetPath= /api/account/v1/{id}
+            - AddResponseHeader= X-Expiring-Service, please use v2
+
+        - id: accounting2
+          uri: lb://accounting
+          predicates:
+            - Method= GET
+            - Path= /account2/{id}
+          filters:
+            - SetPath= /api/account/v2/{id}
